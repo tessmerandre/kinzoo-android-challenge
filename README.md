@@ -29,3 +29,7 @@ Build an Android project with the given public API below
 ### Docs ###
 
 * https://rickandmortyapi.com/documentation
+
+### Submission ###
+
+* Fork this repository on Github and send the link through e-mail
