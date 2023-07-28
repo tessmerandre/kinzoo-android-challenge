@@ -35,7 +35,6 @@ Build an Android project with the given public API below
 * Fork this repository on Github and send the link through e-mail
 
 # Preview
-
 <table>
   <tr>
     <td><img src="https://github.com/VimalPatel14/kinzoo-android-challenge/blob/main/Screen_1.jpg" alt="Image 1"></td>
