@@ -36,5 +36,10 @@ Build an Android project with the given public API below
 
 # Preview
 
-![SC1](https://github.com/VimalPatel14/kinzoo-android-challenge/blob/main/Screen_1.jpg)      ![SC2](https://github.com/VimalPatel14/kinzoo-android-challenge/blob/main/Screen_2.jpg)
+<table>
+  <tr>
+    <td><img src="https://github.com/VimalPatel14/kinzoo-android-challenge/blob/main/Screen_1.jpg" alt="Image 1"></td>
+    <td><img src="https://github.com/VimalPatel14/kinzoo-android-challenge/blob/main/Screen_2.jpg" alt="Image 2"></td>
+  </tr>
+</table>
 
