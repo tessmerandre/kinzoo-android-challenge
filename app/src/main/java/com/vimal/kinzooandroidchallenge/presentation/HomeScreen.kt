@@ -36,9 +36,7 @@ fun HomeScreen(
     val characters =
         characterViewModel.getAllHeroes.collectAsLazyPagingItems()
 
-    if (characters.itemSnapshotList.items.isEmpty() ||
-        characters.itemSnapshotList.items.any { it.id == -1 }
-    )
+    if (characters.itemSnapshotList.items.any { it.id == -1 })
         ScreenWithErrorMessage(modifier = Modifier.padding(16.dp), R.string.error_message)
     else {
         NavHost(navController = navController, startDestination = "character_screen") {
