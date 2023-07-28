@@ -1,6 +1,7 @@
 package com.vimal.kinzooandroidchallenge.data.paging_source
 
 import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState.Loading.endOfPaginationReached
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @ExperimentalPagingApi
 class CharactersRemoteMediator @Inject constructor(
-    private val api: API,
+    private val api: API?,
     private val database: MyDatabase
 ) : RemoteMediator<Int, Character>() {
 
@@ -25,55 +26,64 @@ class CharactersRemoteMediator @Inject constructor(
         loadType: LoadType,
         state: PagingState<Int, Character>
     ): MediatorResult {
-        return try {
-            val page = when (loadType) {
-                LoadType.REFRESH -> {
-                    val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
-                    remoteKeys?.nextPage?.minus(1) ?: CHARACTER_STARTING_PAGE_INDEX
-                }
-
-                LoadType.PREPEND -> {
-                    val remoteKeys = getRemoteKeyForFirstItem(state)
-                    val prevPage = remoteKeys?.prevPage ?: return MediatorResult.Success(
-                        endOfPaginationReached = remoteKeys != null
-                    )
-                    prevPage
-                }
-
-                LoadType.APPEND -> {
-                    val remoteKeys = getRemoteKeyForLastItem(state)
-                    val nextPage = remoteKeys?.nextPage ?: return MediatorResult.Success(
-                        endOfPaginationReached = remoteKeys != null
-                    )
-                    nextPage
-                }
-            }
-
-            val response = api.getAllCharacters(page = page)
-
-            if (response.results.isNotEmpty()) {
-                database.withTransaction {
-                    if (loadType == LoadType.REFRESH) {
-                        characterDao.deleteAllCharacters()
-                        characterDao.deleteAllRemoteKeys()
+        lateinit var returnval: MediatorResult
+        if (api!=null){
+             try {
+                val page = when (loadType) {
+                    LoadType.REFRESH -> {
+                        val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
+                        remoteKeys?.nextPage?.minus(1) ?: CHARACTER_STARTING_PAGE_INDEX
                     }
 
-                    val keys = response.results.map { character ->
-                        CharacterRemoteKeys(
-                            id = character.id,
-                            prevPage = response.info.prev?.split("=")?.get(1)?.toInt(),
-                            nextPage = response.info.next?.split("=")?.get(1)?.toInt(),
+                    LoadType.PREPEND -> {
+                        val remoteKeys = getRemoteKeyForFirstItem(state)
+                        val prevPage = remoteKeys?.prevPage ?: return MediatorResult.Success(
+                            endOfPaginationReached = remoteKeys != null
                         )
+                        prevPage
                     }
 
-                    characterDao.addAllRemoteKeys(characterRemoteKeys = keys)
-                    characterDao.addCharacters(response.results.toCharacter())
+                    LoadType.APPEND -> {
+                        val remoteKeys = getRemoteKeyForLastItem(state)
+                        val nextPage = remoteKeys?.nextPage ?: return MediatorResult.Success(
+                            endOfPaginationReached = remoteKeys != null
+                        )
+                        nextPage
+                    }
                 }
+
+                val response = api.getAllCharacters(page = page)
+
+                if (response.results.isNotEmpty()) {
+                    database.withTransaction {
+                        if (loadType == LoadType.REFRESH) {
+                            characterDao.deleteAllCharacters()
+                            characterDao.deleteAllRemoteKeys()
+                        }
+
+                        val keys = response.results.map { character ->
+                            CharacterRemoteKeys(
+                                id = character.id,
+                                prevPage = response.info.prev?.split("=")?.get(1)?.toInt(),
+                                nextPage = response.info.next?.split("=")?.get(1)?.toInt(),
+                            )
+                        }
+
+                        characterDao.addAllRemoteKeys(characterRemoteKeys = keys)
+                        characterDao.addCharacters(response.results.toCharacter())
+                    }
+                }
+                returnval = MediatorResult.Success(endOfPaginationReached = response.info.next == null)
+            } catch (e: Exception) {
+                returnval = MediatorResult.Error(e)
             }
-            MediatorResult.Success(endOfPaginationReached = response.info.next == null)
-        } catch (e: Exception) {
-            MediatorResult.Error(e)
+        }else{
+            val errorThrowable = Throwable("API is null")
+            MediatorResult.Error(errorThrowable)
         }
+
+        return returnval
+
     }
 
     private suspend fun getRemoteKeyForLastItem(

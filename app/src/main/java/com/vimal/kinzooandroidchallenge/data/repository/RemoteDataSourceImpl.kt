@@ -18,11 +18,12 @@ import com.vimal.kinzooandroidchallenge.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 @ExperimentalPagingApi
 class RemoteDataSourceImpl @Inject constructor(
-    private val API: API,
+    private val API: API?,
     private val database: MyDatabase
 ) : RemoteDataSource {
 
@@ -37,22 +38,43 @@ class RemoteDataSourceImpl @Inject constructor(
                 database = database
             ),
             pagingSourceFactory = { characterDao.getAllCharactersDB() }
-        ).flow
+        ).flow.catch { e ->
+            // Handle errors here
+
+            val errorCharacter = Character(
+                id = -1, name = "Error occurred", status = "",
+                image = "", species = "", gender = ""
+            )
+            emit(PagingData.from(listOf(errorCharacter)))
+        }.onStart {
+            //show a loading indicator.
+        }
     }
 
     override fun getCharacter(characterId: Int): Flow<Resource<CharacterDetail>> {
-        return flow {
-            emit(Resource.Loading())
-            val response = API.getCharacter(id = characterId)
-            val characterDetail = response.toCharacterDetail()
-            emit(Resource.Success(data = characterDetail))
+        return if (API != null) {
+            flow {
+                emit(Resource.Loading())
+                val response = API.getCharacter(id = characterId)
+                val characterDetail = response.toCharacterDetail()
+                emit(Resource.Success(data = characterDetail))
 
-        }.catch {
-            emit(Resource.Error(message = "Does not have a internet connection"))
+            }.catch {
+                emit(Resource.Error(message = "Does not have a internet connection"))
+            }
+        } else {
+            flow {
+                emit(Resource.Error(message = "API is null"))
+            }
         }
     }
 
     override suspend fun getEpisode(episodeId: Int): Episode {
-        return API.getEpisode(id = episodeId).toEpisode()
+        return API?.getEpisode(id = episodeId)?.toEpisode()
+            ?: throw NullPointerException("API is null. Cannot make the API call.")
+    }
+
+    override suspend fun emitError(error: String) {
+        emitError(error)
     }
 }

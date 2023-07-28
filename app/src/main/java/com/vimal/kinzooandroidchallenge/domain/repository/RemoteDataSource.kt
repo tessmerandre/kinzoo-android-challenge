@@ -14,4 +14,5 @@ interface RemoteDataSource {
     fun getCharacter(characterId: Int): Flow<Resource<CharacterDetail>>
 
     suspend fun getEpisode(episodeId: Int): Episode
+    suspend fun emitError(value: String)
 }

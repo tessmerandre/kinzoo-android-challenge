@@ -25,19 +25,22 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRickAndMortyApi(): API {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-            .create(API::class.java)
+    fun provideRickAndMortyApi(): API? {
+        return try {
+            Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .build()
+                .create(API::class.java)
+        }catch (e: Exception){
+            null
+        }
     }
-
 
     @Provides
     @Singleton
     fun provideRemoteDataSource(
-        API: API,
+        API: API?,
         myDatabase: MyDatabase
     ): RemoteDataSource {
         return RemoteDataSourceImpl(
