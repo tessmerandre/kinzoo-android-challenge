@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Kinzoo Android Challenge</string>
+
+    <string name="character">Character</string>
+    <string name="saved">Saved</string>
+    <string name="retry">Retry</string>
+    <string name="character_name">Character Name</string>
+    <string name="character_image">Character Image</string>
+    <string name="episodes">Episodes</string>
+    <string name="gender">Gender</string>
+    <string name="origin">Origin</string>
+    <string name="location">Location</string>
+    <string name="informations">Informations</string>
+    <string name="error_message">Some Error Occurred!</string>
+
+</resources>

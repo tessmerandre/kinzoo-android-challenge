@@ -1,0 +1,25 @@
+package com.vimal.kinzooandroidchallenge.ui.theme
+
+import androidx.compose.ui.unit.dp
+
+val BOTTOM_NAV_ELEVATION = 10.dp
+val TOP_BAR_ELEVATION = 10.dp
+
+val LARGE_PADDING = 16.dp
+val MEDIUM_PADDING = 8.dp
+val SMALL_PADDING = 4.dp
+
+val BOTTOM_NAV_PADDING = 50.dp
+val SHEET_PEEK_HEIGHT = 0.dp
+
+val IMAGE_LIST_TYPE_SIZE_MEDIUM_SCREEN = 150.dp
+val IMAGE_LIST_TYPE_SIZE_COMPACT_SCREEN = 100.dp
+
+val CHARACTER_DETAIL_IMAGE_SIZE = 140.dp
+val CHARACTER_DETAIL_BACKGROUND_IMAGE_SIZE = 130.dp
+val CHARACTER_DETAIL_HEADER_HEIGHT = 290.dp
+
+val LOTTIE_ANIMATION_SIZE = 250.dp
+
+val ICON_SIZE = 24.dp
+
